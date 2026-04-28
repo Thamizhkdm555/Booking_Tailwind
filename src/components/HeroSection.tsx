@@ -69,7 +69,7 @@ export default function HeroSection() {
           >
             {/* Outline stroke text */}
             <span
-              className="block text-stroke text-white/25"
+              className="block text-stroke text-white/25 hover:text-white transition-colors duration-300 cursor-pointer"
               style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.25)' }}
             >
               Sri Ramachandra Medical
