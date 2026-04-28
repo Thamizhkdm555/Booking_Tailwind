@@ -54,9 +54,8 @@ export default function AboutSection() {
             src="/properties/udayarbuilding.jpg"
             alt="Sri Ramachandra Medical Centre Building"
             fill
-            className={`object-cover transition-opacity duration-700 ${
-              videoLoaded ? 'opacity-0' : 'opacity-100'
-            }`}
+            className={`object-cover transition-opacity duration-700 ${videoLoaded ? 'opacity-0' : 'opacity-100'
+              }`}
             sizes="100vw"
             priority
           />
@@ -67,9 +66,8 @@ export default function AboutSection() {
             loop
             playsInline
             onLoadedData={() => setVideoLoaded(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-              videoLoaded ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             poster="/properties/udayarbuilding.jpg"
           >
             <source src="/properties/MEDICAL-CENTRE-2.mp4" type="video/mp4" />
@@ -77,8 +75,8 @@ export default function AboutSection() {
         </motion.div>
 
         {/* Cinematic gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal via-transparent to-charcoal" />
-        <div className="absolute inset-0 bg-gradient-to-r from-charcoal/60 via-transparent to-charcoal/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/40" />
 
         {/* Floating Logo Badge */}
         <motion.div
@@ -87,7 +85,7 @@ export default function AboutSection() {
           animate={isVideoInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.2, ease: easing }}
         >
-          <div className="relative px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 shadow-2xl">
+          {/* <div className="relative px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 shadow-2xl">
             <Image
               src="/properties/logo.png"
               alt="SRMC Logo"
@@ -95,22 +93,25 @@ export default function AboutSection() {
               height={50}
               className="object-contain brightness-0 invert opacity-90"
             />
-          </div>
+          </div> */}
         </motion.div>
 
         {/* Video section heading */}
         <motion.div
-          className="absolute bottom-10 left-0 right-0 z-10 text-center px-6"
+          className="absolute bottom-0 left-0 right-0 z-10 text-center px-6 pb-12 pt-20"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.88) 40%, rgba(0,0,0,0.5) 70%, transparent 100%)'
+          }}
           initial={{ opacity: 0, y: 30 }}
           animate={isVideoInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4, ease: easing }}
         >
-          <p className="text-neon-light text-[11px] md:text-[12px] font-bold tracking-[6px] uppercase mb-3">
+          <p className="text-neon-light text-[11px] md:text-[12px] font-bold tracking-[6px] uppercase mb-4 drop-shadow-md">
             Est. 1985 · Chennai, India
           </p>
-          <h2 className="text-white text-[32px] md:text-[48px] lg:text-[56px] font-black leading-[1.05] tracking-tight">
+          <h2 className="text-white text-[32px] md:text-[52px] lg:text-[60px] font-black leading-[1.05] tracking-tight drop-shadow-xl">
             A Legacy of{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-light to-neon">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#60c0ff] to-neon">
               Healing
             </span>
           </h2>
