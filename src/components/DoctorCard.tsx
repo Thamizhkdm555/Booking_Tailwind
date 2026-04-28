@@ -6,7 +6,6 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  useInView,
 } from 'framer-motion'
 
 interface DoctorCardProps {
@@ -17,6 +16,16 @@ interface DoctorCardProps {
   index: number
 }
 
+// Accent palette — each card gets a unique dual-tone gradient
+const accents = [
+  { from: 'rgba(25,118,210,0.14)', to: 'rgba(156,39,176,0.08)', glow: 'rgba(25,118,210,0.18)' },
+  { from: 'rgba(233,30,99,0.12)', to: 'rgba(255,152,0,0.08)', glow: 'rgba(233,30,99,0.16)' },
+  { from: 'rgba(0,172,193,0.13)', to: 'rgba(76,175,80,0.08)', glow: 'rgba(0,172,193,0.16)' },
+  { from: 'rgba(103,58,183,0.13)', to: 'rgba(3,169,244,0.08)', glow: 'rgba(103,58,183,0.16)' },
+  { from: 'rgba(255,87,34,0.12)', to: 'rgba(255,193,7,0.08)', glow: 'rgba(255,87,34,0.16)' },
+  { from: 'rgba(0,150,136,0.13)', to: 'rgba(63,81,181,0.08)', glow: 'rgba(0,150,136,0.16)' },
+]
+
 export default function DoctorCard({
   initials,
   dept,
@@ -25,134 +34,133 @@ export default function DoctorCard({
   index,
 }: DoctorCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(cardRef, { once: true, margin: '-80px' })
 
-  // ── 3D Tilt via useMotionValue + useSpring ──────────────────
+  // ── 3D Tilt engine ──
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  // Spring config for snappy yet smooth feel
-  const springConfig = { stiffness: 280, damping: 22, mass: 0.5 }
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig)
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig)
+  const spring = { stiffness: 350, damping: 25, mass: 0.4 }
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [12, -12]), spring)
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-14, 14]), spring)
+  const scale = useSpring(1, { stiffness: 350, damping: 28 })
+
+  // Glare
   const glareX = useTransform(mouseX, [-0.5, 0.5], ['0%', '100%'])
   const glareY = useTransform(mouseY, [-0.5, 0.5], ['0%', '100%'])
 
-  // Scale spring
-  const scale = useSpring(1, { stiffness: 300, damping: 25 })
+  // Floating shadow intensity
+  const shadowX = useTransform(mouseX, [-0.5, 0.5], [-8, 8])
+  const shadowY = useTransform(mouseY, [-0.5, 0.5], [-4, 16])
 
-  // Top bar width
-  const barWidth = useMotionValue('0%')
-  const barWidthSpring = useSpring(barWidth as unknown as number, {
-    stiffness: 260,
-    damping: 24,
-  })
+  const accent = accents[index % accents.length]
 
-  function onMouseMove(e: MouseEvent<HTMLDivElement>) {
+  function onMove(e: MouseEvent<HTMLDivElement>) {
     if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    // Normalize to [-0.5, 0.5]
-    const x = (e.clientX - rect.left) / rect.width - 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5
-    mouseX.set(x)
-    mouseY.set(y)
+    const r = cardRef.current.getBoundingClientRect()
+    mouseX.set((e.clientX - r.left) / r.width - 0.5)
+    mouseY.set((e.clientY - r.top) / r.height - 0.5)
   }
 
-  function onMouseEnter() {
-    scale.set(1.02)
-    barWidth.set(100)
+  function onEnter() {
+    scale.set(1.04)
   }
 
-  function onMouseLeave() {
+  function onLeave() {
     mouseX.set(0)
     mouseY.set(0)
     scale.set(1)
-    barWidth.set(0)
   }
 
   return (
-    // Entrance animation with stagger
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 60 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      onMouseMove={onMove}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      // ── Viewport reveal ──
+      initial={{ opacity: 0, y: 80, scale: 0.9 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-80px' }}
       transition={{
-        duration: 0.6,
+        duration: 0.8,
         delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1],
+        type: 'spring',
+        stiffness: 80,
+        damping: 18,
       }}
-      className="perspective-1000 cursor-pointer"
-      onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      style={{ perspective: 900 }}
+      className="cursor-pointer will-change-transform"
     >
       <motion.div
-        className="relative bg-white rounded-xl p-8 border border-gray-100 overflow-hidden"
+        className="relative rounded-2xl p-8 md:p-9 border border-gray-100/70 overflow-hidden h-full"
         style={{
           rotateX,
           rotateY,
           scale,
           transformStyle: 'preserve-3d',
           transformOrigin: 'center center',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+          background: `linear-gradient(145deg, ${accent.from} 0%, ${accent.to} 55%, rgba(255,255,255,0.95) 100%)`,
+          boxShadow: `0 4px 20px rgba(0,0,0,0.04)`,
         }}
         whileHover={{
-          boxShadow: '0 20px 60px rgba(25,118,210,0.12)',
+          boxShadow: '0 24px 64px rgba(25,118,210,0.14), 0 8px 24px rgba(0,0,0,0.06)',
         }}
-        transition={{ boxShadow: { duration: 0.3 } }}
+        transition={{ boxShadow: { duration: 0.35 } }}
       >
-        {/* Glare effect */}
+        {/* 3D Glare */}
         <motion.div
-          className="absolute inset-0 pointer-events-none opacity-0 rounded-xl"
+          className="absolute inset-0 pointer-events-none rounded-2xl"
           style={{
-            background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.18) 0%, transparent 65%)`,
+            background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.28) 0%, transparent 55%)`,
+            opacity: 0,
           }}
           whileHover={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.25 }}
         />
 
-        {/* Top accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] overflow-hidden rounded-t-xl">
-          <motion.div
-            className="h-full bg-gradient-to-r from-neon to-neon-light origin-left"
-            style={{ scaleX: barWidthSpring as unknown as number, transformOrigin: 'left' }}
-            initial={{ scaleX: 0 }}
-          />
-        </div>
+        {/* Corner accent glow */}
+        <div
+          className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none"
+          style={{ background: `radial-gradient(circle, ${accent.glow} 0%, transparent 70%)` }}
+        />
 
-        {/* Avatar */}
+        {/* Bottom fade */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1/3 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, rgba(255,255,255,0.7), transparent)' }}
+        />
+
+        {/* Avatar — elevated in Z */}
         <motion.div
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-neon to-neon-light flex items-center justify-center mb-6"
-          style={{ translateZ: 20 }}
-          whileHover={{ y: -4 }}
-          transition={{ duration: 0.2 }}
+          className="relative w-14 h-14 rounded-full bg-gradient-to-br from-neon to-neon-light flex items-center justify-center mb-7"
+          style={{ translateZ: 35 }}
         >
           <span className="text-white font-black text-xl">{initials}</span>
         </motion.div>
 
-        {/* Dept label */}
-        <p className="text-neon text-[10px] font-bold tracking-[4px] uppercase mb-4">
+        {/* Dept */}
+        <p className="relative text-neon text-[10px] font-bold tracking-[4px] uppercase mb-3" style={{ translateZ: 20 }}>
           {dept}
         </p>
 
         {/* Name */}
-        <h3 className="text-charcoal text-[22px] font-black leading-tight mb-2">
+        <h3 className="relative text-charcoal text-[22px] font-black leading-tight mb-2" style={{ translateZ: 25 }}>
           {name}
         </h3>
 
         {/* Experience */}
-        <p className="text-body-text/40 text-[13px] font-normal leading-relaxed">
+        <p className="relative text-body-text/40 text-[13px] font-normal leading-relaxed" style={{ translateZ: 15 }}>
           {experience} Experience
         </p>
 
-        {/* Book button — appears on hover */}
+        {/* Book button — slides up on hover */}
         <motion.div
-          className="mt-6 overflow-hidden"
+          className="relative mt-7 overflow-hidden"
           initial={{ height: 0, opacity: 0 }}
           whileHover={{ height: 'auto', opacity: 1 }}
-          transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <button className="w-full py-3 rounded-lg bg-neon text-white text-[12px] font-bold tracking-widest uppercase hover:bg-neon-dark transition-colors duration-200">
+          <button className="w-full py-3 rounded-xl bg-neon text-white text-[11px] font-bold tracking-[3px] uppercase hover:bg-neon-dark transition-colors duration-200">
             Book Appointment
           </button>
         </motion.div>

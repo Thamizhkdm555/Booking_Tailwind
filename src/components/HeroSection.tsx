@@ -62,14 +62,14 @@ export default function HeroSection() {
         {/* Massive headline */}
         <div className="overflow-hidden">
           <motion.h1
-            className="text-[72px] md:text-[130px] lg:text-[160px] font-black leading-none tracking-tight"
+            className="text-[36px] sm:text-[52px] md:text-[130px] lg:text-[160px] font-black leading-none tracking-tight group"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           >
             {/* Outline stroke text */}
             <span
-              className="block text-stroke text-white/25 hover:text-white transition-colors duration-300 cursor-pointer"
+              className="block text-transparent group-hover:text-white transition-all duration-300 cursor-pointer"
               style={{ WebkitTextStroke: '1.5px rgba(255,255,255,0.25)' }}
             >
               Sri Ramachandra Medical

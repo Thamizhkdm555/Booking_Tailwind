@@ -57,12 +57,12 @@ export default function StatsSection() {
   const isInView = useInView(headerRef, { once: true })
 
   return (
-    <section className="py-32 px-6 md:px-14 bg-white">
+    <section className="py-16 md:py-20 px-6 md:px-14 bg-white">
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <motion.p
           ref={headerRef}
-          className="text-neon text-[11px] font-bold tracking-[5px] uppercase mb-20"
+          className="text-neon text-[11px] font-bold tracking-[5px] uppercase mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
